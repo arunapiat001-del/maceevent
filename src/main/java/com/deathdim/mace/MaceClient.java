@@ -7,7 +7,13 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.model.ModelPart;
 import net.minecraft.client.option.Perspective;
+import net.minecraft.client.render.entity.model.BipedEntityModel;
+import net.minecraft.client.render.entity.state.BipedEntityRenderState;
+import net.minecraft.client.render.entity.state.PlayerEntityRenderState;
+import net.minecraft.util.Arm;
+import net.minecraft.util.math.MathHelper;
 
 public class MaceClient implements ClientModInitializer {
     public static final double RADIUS = 3.8;   // jarak kamera dari pemain
@@ -92,5 +98,37 @@ public class MaceClient implements ClientModInitializer {
 
     public static double angle() {
         return angle0 + (System.currentTimeMillis() - startMs) / 1000.0 * SPEED;
+    }
+
+    private static long lastLog = 0;
+
+    public static void debug(String msg) {
+        long now = System.currentTimeMillis();
+        if (now - lastLog < 1000) return;
+        lastLog = now;
+        System.out.println("[maceevent] " + msg);
+    }
+
+    /** Dipanggil dari mixin model: mengangkat lengan yang memegang mace. */
+    public static void applyPose(BipedEntityModel<?> m, BipedEntityRenderState state) {
+        if (!(state instanceof PlayerEntityRenderState ps)) return;
+        float w = armWeight();
+        if (w <= 0f) return;
+        MinecraftClient mc = MinecraftClient.getInstance();
+        if (mc.player == null) return;
+
+        double dx = ps.x - mc.player.getX();
+        double dy = ps.y - mc.player.getY();
+        double dz = ps.z - mc.player.getZ();
+        boolean mine = ps.id == mc.player.getId() || dx * dx + dy * dy + dz * dz < 1.0;
+        debug("applyPose id=" + ps.id + " idSaya=" + mc.player.getId() + " cocok=" + mine + " w=" + w);
+        if (!mine) return;
+
+        boolean right = ps.mainArm == Arm.RIGHT;
+        ModelPart arm = right ? m.rightArm : m.leftArm;
+        arm.pitch = MathHelper.lerp(w, arm.pitch, -2.9f);            // lengan lurus ke atas
+        arm.yaw = MathHelper.lerp(w, arm.yaw, 0f);
+        arm.roll = MathHelper.lerp(w, arm.roll, right ? -0.15f : 0.15f);
+        m.head.pitch = MathHelper.lerp(w, m.head.pitch, -0.45f);     // kepala menengadah
     }
 }
