@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(BipedEntityModel.class)
+@Mixin(value = BipedEntityModel.class, priority = 100000)
 public abstract class MaceArmMixin {
     @Inject(method = "setAngles(Lnet/minecraft/client/render/entity/state/BipedEntityRenderState;)V",
             at = @At("TAIL"))
