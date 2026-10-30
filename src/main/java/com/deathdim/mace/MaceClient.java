@@ -131,4 +131,15 @@ public class MaceClient implements ClientModInitializer {
         arm.roll = MathHelper.lerp(w, arm.roll, right ? -0.15f : 0.15f);
         m.head.pitch = MathHelper.lerp(w, m.head.pitch, -0.45f);     // kepala menengadah
     }
+
+    /** Mengubah pose lengan di data render sebelum model menghitung sudutnya (seperti melempar trident). */
+    public static void applyState(BipedEntityRenderState state) {
+        if (!(state instanceof PlayerEntityRenderState ps)) return;
+        if (armWeight() < 0.5f) return;
+        MinecraftClient mc = MinecraftClient.getInstance();
+        if (mc.player == null || ps.id != mc.player.getId()) return;
+        BipedEntityModel.ArmPose raised = BipedEntityModel.ArmPose.values()[4]; // pose lempar trident
+        if (ps.mainArm == Arm.RIGHT) ps.rightArmPose = raised;
+        else ps.leftArmPose = raised;
+    }
 }
