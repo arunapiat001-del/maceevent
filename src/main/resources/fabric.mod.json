@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "maceevent",
+  "version": "${version}",
+  "name": "Mace Event",
+  "description": "Animasi selebrasi untuk event mace.",
+  "authors": ["Me!"],
+  "license": "CC0-1.0",
+  "environment": "client",
+  "entrypoints": {
+    "client": ["com.deathdim.mace.MaceClient"]
+  },
+  "mixins": [
+    { "config": "maceevent.client.mixins.json", "environment": "client" }
+  ],
+  "depends": {
+    "fabricloader": ">=0.19.0",
+    "minecraft": "~1.21.11",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
+}

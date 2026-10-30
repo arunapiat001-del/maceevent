@@ -1,0 +1,7 @@
+{
+  "required": true,
+  "package": "com.deathdim.mace.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "client": ["MaceArmMixin", "MaceCameraMixin"],
+  "injectors": { "defaultRequire": 1 }
+}
